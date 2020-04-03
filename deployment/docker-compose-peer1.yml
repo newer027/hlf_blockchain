@@ -1,0 +1,46 @@
+
+version: '2'
+
+networks:
+    behave:
+
+services:
+    peer0.org2.example.com:
+        extends:
+            file: docker-compose-base.yml
+            service: peer
+        container_name: peer0.org2.example.com
+        environment:
+            - CORE_PEER_CHAINCODELISTENADDRESS=peer0.org2.example.com:7052
+            - CORE_PEER_ID=peer0.org2.example.com
+            - CORE_PEER_ADDRESS=peer0.org2.example.com:7051
+            - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+            - CORE_PEER_CHAINCODEADDRESS=peer0.org2.example.com:7052
+            - CORE_PEER_LOCALMSPID=Org2MSP
+            - CORE_PEER_TLS_CLIENTROOTCAS_FILES=/var/hyperledger/users/Admin@org2.example.com/tls/ca.crt
+            - CORE_PEER_TLS_CLIENTCERT_FILE=/var/hyperledger/users/Admin@org2.example.com/tls/client.crt
+            - CORE_PEER_TLS_CLIENTKEY_FILE=/var/hyperledger/users/Admin@org2.example.com/tls/client.key
+            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+        command: peer node start
+        volumes:
+            - ../crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/msp:/var/hyperledger/msp
+            - ../crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls:/var/hyperledger/tls
+            - ../crypto-config/peerOrganizations/org2.example.com/users:/var/hyperledger/users
+            - ../network-config/:/var/hyperledger/configs
+        extra_hosts:
+            - "orderer0.example.com:10.10.30.136"
+            - "orderer1.example.com:10.10.30.136"
+            - "orderer2.example.com:10.10.30.136"
+            - "ca.example.com:10.10.30.136"
+            - "peer0.org1.example.com:10.10.70.137"
+        networks:
+          behave:
+             aliases:
+               - net
+        env_file: .env
+        ports:
+          - 7051:7051
+          - 7053:7053
